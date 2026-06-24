@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { Code2, Layers, Rocket } from "lucide-react";
 import { profile } from "@/data/content";
+import { useSpotlight } from "./useSpotlight";
 
 const pillars = [
   {
@@ -24,40 +27,30 @@ export default function About() {
   return (
     <section id="about" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
-        <SectionHeading tag="~/about" title="Tentang saya" />
+        <SectionHeading eyebrow="Tentang saya" title="Lebih kenal dengan saya" />
 
-        <div className="mt-10 grid lg:grid-cols-[auto_1fr_1fr] gap-10 lg:gap-12 items-start">
-          <div className="relative size-40 sm:size-48 mx-auto lg:mx-0">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-accent to-transparent opacity-30 blur-xl" />
+        <div className="mt-12 grid lg:grid-cols-[auto_1fr] gap-10 items-start">
+          <div className="relative size-36 sm:size-44 mx-auto lg:mx-0 shrink-0">
+            <div className="absolute -inset-2 rounded-full bg-gradient-to-br from-accent to-warm opacity-30 blur-lg" />
             <Image
               src={profile.photo}
               alt={profile.name}
               fill
-              sizes="192px"
-              className="relative rounded-full object-cover border-2 border-accent/40"
+              sizes="176px"
+              className="relative rounded-full object-cover border-2 border-white/10"
             />
           </div>
 
-          <p className="text-lg sm:text-xl text-fog leading-relaxed font-medium">
-            {profile.summary}
-          </p>
+          <div>
+            <p className="text-lg sm:text-xl text-fog leading-relaxed font-medium max-w-2xl">
+              {profile.summary}
+            </p>
 
-          <div className="space-y-6">
-            {pillars.map((p) => (
-              <div key={p.title} className="flex gap-4">
-                <div className="shrink-0 size-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
-                  <p.icon className="size-5 text-accent" strokeWidth={1.8} />
-                </div>
-                <div>
-                  <h3 className="font-display font-semibold text-fog">
-                    {p.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-fog-muted leading-relaxed">
-                    {p.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
+            <div className="mt-8 grid sm:grid-cols-3 gap-4">
+              {pillars.map((p) => (
+                <PillarCard key={p.title} {...p} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -65,19 +58,46 @@ export default function About() {
   );
 }
 
+function PillarCard({
+  icon: Icon,
+  title,
+  desc,
+}: {
+  icon: typeof Code2;
+  title: string;
+  desc: string;
+}) {
+  const spotlight = useSpotlight<HTMLDivElement>();
+  return (
+    <div
+      ref={spotlight.ref}
+      onMouseMove={spotlight.onMouseMove}
+      className="spotlight glass glass-hover rounded-2xl p-5"
+    >
+      <div className="size-10 rounded-xl bg-gradient-to-br from-accent/20 to-warm/10 flex items-center justify-center">
+        <Icon className="size-5 text-accent" strokeWidth={1.8} />
+      </div>
+      <h3 className="mt-4 font-display font-bold text-fog">{title}</h3>
+      <p className="mt-1.5 text-sm text-fog-muted leading-relaxed">{desc}</p>
+    </div>
+  );
+}
+
 export function SectionHeading({
-  tag,
+  eyebrow,
   title,
   subtitle,
 }: {
-  tag: string;
+  eyebrow: string;
   title: string;
   subtitle?: string;
 }) {
   return (
     <div>
-      <p className="font-mono text-sm text-accent mb-2">{tag}</p>
-      <h2 className="font-display text-2xl sm:text-3xl font-semibold text-fog tracking-tight">
+      <span className="pill-border inline-flex items-center rounded-full bg-ink-panel/60 px-3.5 py-1 text-xs font-semibold text-accent">
+        {eyebrow}
+      </span>
+      <h2 className="mt-4 font-display text-2xl sm:text-3xl font-extrabold text-fog tracking-tight">
         {title}
       </h2>
       {subtitle && (

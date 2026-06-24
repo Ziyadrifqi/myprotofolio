@@ -1,77 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowDown, Circle, Mail } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { profile } from "@/data/content";
 import { GithubIcon, LinkedinIcon } from "./icons";
-
-const COMMAND = "whoami --role --stack";
-const TYPE_SPEED = 55;
+import { useSpotlight } from "./useSpotlight";
 
 export default function Hero() {
-  const [typed, setTyped] = useState("");
-  const [showOutput, setShowOutput] = useState(false);
-
-  useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      i += 1;
-      setTyped(COMMAND.slice(0, i));
-      if (i >= COMMAND.length) {
-        clearInterval(interval);
-        setTimeout(() => setShowOutput(true), 300);
-      }
-    }, TYPE_SPEED);
-    return () => clearInterval(interval);
-  }, []);
+  const spotlight = useSpotlight<HTMLDivElement>();
 
   return (
     <section
       id="home"
-      className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 px-5 sm:px-8 overflow-hidden"
+      className="relative pt-36 pb-20 sm:pt-44 sm:pb-28 px-5 sm:px-8 overflow-hidden"
     >
-      {/* Ambient grid backdrop */}
-      <div
-        className="absolute inset-0 -z-10 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "linear-gradient(var(--ink-border) 1px, transparent 1px), linear-gradient(90deg, var(--ink-border) 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-        }}
-      />
-
-      <div className="mx-auto max-w-6xl grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
+      <div className="mx-auto max-w-6xl grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
         {/* Left: copy */}
-        <div>
-          <div className="mb-6 relative size-20 sm:size-24">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-accent to-transparent opacity-40 blur-md" />
-            <Image
-              src={profile.photo}
-              alt={profile.name}
-              fill
-              sizes="96px"
-              className="relative rounded-full object-cover border-2 border-accent/50"
-              priority
-            />
+        <div className="animate-fade-up">
+          <div className="pill-border inline-flex items-center gap-2 rounded-full bg-ink-panel/60 px-4 py-1.5 text-xs font-semibold text-fog mb-6">
+            <Sparkles className="size-3.5 text-warm" />
+            {profile.availableForWork ? "Tersedia untuk proyek baru" : profile.role}
           </div>
 
-          {profile.availableForWork && (
-            <div className="inline-flex items-center gap-2 rounded-full border border-mint/30 bg-mint/10 px-3 py-1 font-mono text-xs text-mint mb-6">
-              <Circle className="size-2 fill-mint text-mint animate-pulse" />
-              Tersedia untuk proyek baru
-            </div>
-          )}
-
-          <p className="font-mono text-sm text-accent mb-3">
-            ~/portfolio/{profile.role.toLowerCase().replace(/\s+/g, "-")}
-          </p>
-
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.4rem] font-semibold leading-[1.08] tracking-tight text-fog">
-            {profile.name}
+          <h1 className="font-display text-[2.6rem] sm:text-5xl lg:text-[3.6rem] font-extrabold leading-[1.05] tracking-tight text-fog">
+            Halo, saya{" "}
+            <span className="gradient-text">{profile.name.split(" ")[0]}</span>
           </h1>
 
-          <p className="mt-4 text-lg sm:text-xl text-fog-muted font-medium">
+          <p className="mt-4 text-xl sm:text-2xl text-fog-muted font-semibold">
             {profile.role}
           </p>
 
@@ -79,129 +35,103 @@ export default function Hero() {
             {profile.tagline}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-9 flex flex-wrap items-center gap-3">
             <a
               href="#projects"
-              className="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-3 font-mono text-sm font-medium text-ink hover:bg-accent/90 transition-colors"
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent to-accent-soft px-6 py-3.5 text-sm font-semibold text-ink shadow-lg shadow-accent/20 hover:shadow-accent/35 hover:scale-[1.02] transition-all"
             >
               Lihat proyek
+              <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
             </a>
             <a
               href={profile.cvUrl}
-              className="inline-flex items-center gap-2 rounded-md border border-ink-border px-5 py-3 font-mono text-sm text-fog hover:border-accent/50 hover:text-accent transition-colors"
+              className="inline-flex items-center gap-2 rounded-full glass px-6 py-3.5 text-sm font-semibold text-fog hover:border-accent/40 transition-colors"
             >
               Unduh CV
             </a>
           </div>
 
-          <div className="mt-8 flex items-center gap-4">
+          <div className="mt-8 flex items-center gap-3">
             <a
               href={profile.github}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
-              className="text-fog-muted hover:text-accent transition-colors"
+              className="size-10 rounded-full glass flex items-center justify-center text-fog-muted hover:text-accent hover:border-accent/40 transition-colors"
             >
-              <GithubIcon className="size-5" />
+              <GithubIcon className="size-4.5" />
             </a>
             <a
               href={profile.linkedin}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"
-              className="text-fog-muted hover:text-accent transition-colors"
+              className="size-10 rounded-full glass flex items-center justify-center text-fog-muted hover:text-accent hover:border-accent/40 transition-colors"
             >
-              <LinkedinIcon className="size-5" />
-            </a>
-            <a
-              href={`mailto:${profile.email}`}
-              aria-label="Email"
-              className="text-fog-muted hover:text-accent transition-colors"
-            >
-              <Mail className="size-5" />
+              <LinkedinIcon className="size-4.5" />
             </a>
           </div>
         </div>
 
-        {/* Right: signature terminal window */}
+        {/* Right: glass spotlight card with photo */}
         <div className="animate-float-slow">
-          <div className="rounded-xl border border-ink-border bg-ink-panel shadow-2xl shadow-black/40 overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-ink-border bg-ink-panel-light">
-              <span className="size-3 rounded-full bg-[#ff5f57]" />
-              <span className="size-3 rounded-full bg-[#febc2e]" />
-              <span className="size-3 rounded-full bg-[#28c840]" />
-              <span className="ml-3 font-mono text-xs text-fog-muted">
-                ziyad@portfolio — zsh
-              </span>
-              <div className="ml-auto relative size-6 shrink-0">
-                <Image
-                  src={profile.photo}
-                  alt={profile.name}
-                  fill
-                  sizes="24px"
-                  className="rounded-full object-cover border border-accent/40"
-                />
-              </div>
+          <div
+            ref={spotlight.ref}
+            onMouseMove={spotlight.onMouseMove}
+            className="spotlight glass rounded-[2rem] p-8 sm:p-10 shadow-2xl shadow-black/40"
+          >
+            <div className="relative mx-auto size-40 sm:size-48">
+              <div className="absolute -inset-3 rounded-full bg-gradient-to-br from-accent via-accent-soft to-warm opacity-50 blur-xl" />
+              <Image
+                src={profile.photo}
+                alt={profile.name}
+                fill
+                sizes="192px"
+                className="relative rounded-full object-cover border-2 border-white/10"
+                priority
+              />
             </div>
 
-            <div className="p-5 sm:p-6 font-mono text-[13px] sm:text-sm leading-relaxed min-h-[260px]">
-              <p className="text-fog-muted">
-                <span className="text-mint">➜</span>{" "}
-                <span className="text-accent">~</span> {typed}
-                <span className="cursor-blink">▌</span>
+            <div className="mt-7 text-center">
+              <p className="font-display text-lg font-bold text-fog">
+                {profile.name}
               </p>
+              <p className="mt-1 text-sm text-fog-muted">{profile.location}</p>
+            </div>
 
-              {showOutput && (
-                <div className="mt-4 space-y-2 animate-[fadeIn_0.4s_ease]">
-                  <Row label="name" value={profile.name} />
-                  <Row label="role" value={profile.role} />
-                  <Row label="location" value={profile.location} />
-                  <Row
-                    label="stack"
-                    value="Next.js · Node.js · PostgreSQL"
-                  />
-                  <Row
-                    label="status"
-                    value="available"
-                    valueClass="text-mint"
-                  />
-                  <p className="pt-3 text-fog-muted">
-                    <span className="text-mint">➜</span>{" "}
-                    <span className="text-accent">~</span>{" "}
-                    <span className="cursor-blink">▌</span>
-                  </p>
-                </div>
-              )}
+            <div className="mt-6 grid grid-cols-3 gap-2 text-center">
+              <Stat label="Stack" value="Next.js" />
+              <Stat label="Fokus" value="Full Stack" />
+              <Stat label="Status" value="Available" accent />
             </div>
           </div>
         </div>
       </div>
-
-      <a
-        href="#about"
-        aria-label="Gulir ke bawah"
-        className="hidden sm:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-fog-muted hover:text-accent transition-colors"
-      >
-        <span className="font-mono text-[11px]">scroll</span>
-        <ArrowDown className="size-4 animate-bounce" />
-      </a>
     </section>
   );
 }
 
-function Row({
+function Stat({
   label,
   value,
-  valueClass = "text-fog",
+  accent,
 }: {
   label: string;
   value: string;
-  valueClass?: string;
+  accent?: boolean;
 }) {
   return (
-    <p>
-      <span className="text-fog-muted">{label}:</span>{" "}
-      <span className={valueClass}>{value}</span>
-    </p>
+    <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] px-2 py-2.5">
+      <p className="text-[10px] uppercase tracking-wide text-fog-muted">
+        {label}
+      </p>
+      <p
+        className={`mt-0.5 text-xs font-semibold ${
+          accent ? "text-accent" : "text-fog"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
   );
 }

@@ -6,11 +6,12 @@ import { profile } from "@/data/content";
 import { SectionHeading } from "./About";
 import { GithubIcon, LinkedinIcon } from "./icons";
 
-type Status = "idle" | "sending" | "sent";
+type Status = "idle" | "sending" | "sent" | "error";
 
 export default function Contact() {
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [errorMessage, setErrorMessage] = useState("");
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -18,33 +19,66 @@ export default function Contact() {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (
+      !profile.web3formsAccessKey ||
+      profile.web3formsAccessKey === "GANTI_DENGAN_ACCESS_KEY_ANDA"
+    ) {
+      setStatus("error");
+      setErrorMessage(
+        "Form belum terhubung ke layanan email. Tambahkan Access Key Web3Forms di src/data/content.ts."
+      );
+      return;
+    }
+
     setStatus("sending");
+    setErrorMessage("");
 
-    const subject = encodeURIComponent(`Pesan dari ${form.name || "Pengunjung Portofolio"}`);
-    const body = encodeURIComponent(
-      `${form.message}\n\n— ${form.name} (${form.email})`
-    );
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: profile.web3formsAccessKey,
+          subject: `Pesan baru dari ${form.name} — Portofolio`,
+          name: form.name,
+          email: form.email,
+          message: form.message,
+        }),
+      });
 
-    setTimeout(() => {
-      window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
-      setStatus("sent");
-    }, 600);
+      const data = await res.json();
+
+      if (data.success) {
+        setStatus("sent");
+        setForm({ name: "", email: "", message: "" });
+      } else {
+        setStatus("error");
+        setErrorMessage(data.message || "Gagal mengirim pesan. Coba lagi.");
+      }
+    } catch {
+      setStatus("error");
+      setErrorMessage("Tidak bisa terhubung ke server. Periksa koneksi Anda.");
+    }
   }
 
   return (
     <section id="contact" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
-          tag="~/contact"
+          eyebrow="Kontak"
           title="Mari berdiskusi"
           subtitle="Punya proyek atau peluang kolaborasi? Kirim pesan, saya akan balas secepatnya."
         />
 
-        <div className="mt-10 grid lg:grid-cols-[0.8fr_1.2fr] gap-8">
+        <div className="mt-10 grid lg:grid-cols-[0.8fr_1.2fr] gap-6">
           {/* Contact info */}
-          <div className="space-y-5">
+          <div className="space-y-4">
             <InfoRow icon={Mail} label="Email" value={profile.email} href={`mailto:${profile.email}`} />
             <InfoRow icon={MapPin} label="Lokasi" value={profile.location} />
             <InfoRow icon={GithubIcon} label="GitHub" value="@ziyadrifqi" href={profile.github} />
@@ -54,7 +88,7 @@ export default function Contact() {
           {/* Form */}
           <form
             onSubmit={handleSubmit}
-            className="rounded-xl border border-ink-border bg-ink-panel p-6 sm:p-8 space-y-5"
+            className="glass rounded-2xl p-6 sm:p-8 space-y-5"
           >
             <div className="grid sm:grid-cols-2 gap-5">
               <Field
@@ -79,7 +113,7 @@ export default function Contact() {
             <div>
               <label
                 htmlFor="message"
-                className="block font-mono text-xs text-fog-muted mb-2"
+                className="block text-xs font-semibold text-fog-muted mb-2"
               >
                 Pesan
               </label>
@@ -91,14 +125,16 @@ export default function Contact() {
                 required
                 rows={5}
                 placeholder="Ceritakan tentang proyek Anda..."
-                className="w-full rounded-md border border-ink-border bg-ink px-4 py-3 text-sm text-fog placeholder:text-fog-muted/60 focus:border-accent outline-none transition-colors resize-none"
+                suppressHydrationWarning
+                className="w-full rounded-xl bg-white/[0.03] border border-white/[0.08] px-4 py-3 text-sm text-fog placeholder:text-fog-muted/60 focus:border-accent/50 outline-none transition-colors resize-none"
               />
             </div>
 
             <button
               type="submit"
-              disabled={status !== "idle"}
-              className="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-3 font-mono text-sm font-medium text-ink hover:bg-accent/90 transition-colors disabled:opacity-70"
+              disabled={status === "sending" || status === "sent"}
+              suppressHydrationWarning
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent to-accent-soft px-6 py-3.5 text-sm font-semibold text-ink shadow-lg shadow-accent/20 hover:shadow-accent/35 hover:scale-[1.02] transition-all disabled:opacity-70 disabled:hover:scale-100"
             >
               {status === "idle" && (
                 <>
@@ -107,16 +143,24 @@ export default function Contact() {
               )}
               {status === "sending" && (
                 <>
-                  Menyiapkan email <Loader2 className="size-4 animate-spin" />
+                  Mengirim pesan <Loader2 className="size-4 animate-spin" />
                 </>
               )}
               {status === "sent" && "Terkirim ✓"}
+              {status === "error" && (
+                <>
+                  Coba lagi <Send className="size-4" />
+                </>
+              )}
             </button>
 
             {status === "sent" && (
-              <p className="font-mono text-xs text-mint">
-                Aplikasi email Anda terbuka dengan pesan ini siap dikirim.
+              <p className="text-xs text-accent font-medium">
+                Pesan berhasil terkirim. Terima kasih, saya akan segera membalas.
               </p>
+            )}
+            {status === "error" && (
+              <p className="text-xs text-warm font-medium">{errorMessage}</p>
             )}
           </form>
         </div>
@@ -137,12 +181,12 @@ function InfoRow({
   href?: string;
 }) {
   const content = (
-    <div className="flex items-center gap-4 rounded-lg border border-ink-border bg-ink-panel p-4 hover:border-accent/40 transition-colors">
-      <div className="shrink-0 size-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+    <div className="glass glass-hover flex items-center gap-4 rounded-2xl p-4">
+      <div className="shrink-0 size-11 rounded-xl bg-gradient-to-br from-accent/20 to-warm/10 flex items-center justify-center">
         <Icon className="size-4.5 text-accent" />
       </div>
       <div>
-        <p className="font-mono text-[11px] text-fog-muted">{label}</p>
+        <p className="text-[11px] font-semibold text-fog-muted uppercase tracking-wide">{label}</p>
         <p className="text-sm text-fog">{value}</p>
       </div>
     </div>
@@ -177,7 +221,7 @@ function Field({
 }) {
   return (
     <div>
-      <label htmlFor={name} className="block font-mono text-xs text-fog-muted mb-2">
+      <label htmlFor={name} className="block text-xs font-semibold text-fog-muted mb-2">
         {label}
       </label>
       <input
@@ -188,7 +232,8 @@ function Field({
         onChange={onChange}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-md border border-ink-border bg-ink px-4 py-3 text-sm text-fog placeholder:text-fog-muted/60 focus:border-accent outline-none transition-colors"
+        suppressHydrationWarning
+        className="w-full rounded-xl bg-white/[0.03] border border-white/[0.08] px-4 py-3 text-sm text-fog placeholder:text-fog-muted/60 focus:border-accent/50 outline-none transition-colors"
       />
     </div>
   );

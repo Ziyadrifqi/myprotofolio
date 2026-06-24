@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, X, TerminalSquare } from "lucide-react";
+import { Menu, Sparkles, X } from "lucide-react";
 import { navLinks, profile } from "@/data/content";
+import { usePreloader } from "./PreloaderContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { trigger } = usePreloader();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -15,37 +17,48 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  function navigateTo(hash: string) {
+    return (e: React.MouseEvent) => {
+      e.preventDefault();
+      setOpen(false);
+      trigger(() => {
+        const target = document.querySelector(hash);
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    };
+  }
+
   return (
-    <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-ink/90 backdrop-blur-md border-b border-ink-border"
-          : "bg-transparent border-b border-transparent"
-      }`}
-    >
-      <nav className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
+    <header className="fixed top-4 inset-x-0 z-50 px-4 sm:px-6">
+      <nav
+        className={`mx-auto max-w-4xl flex items-center justify-between rounded-full px-4 sm:px-5 h-14 transition-all duration-300 ${
+          scrolled
+            ? "glass shadow-lg shadow-black/20"
+            : "bg-ink-panel/40 border border-ink-border backdrop-blur-md"
+        }`}
+      >
         <a
           href="#home"
-          className="flex items-center gap-2 font-display font-semibold text-fog tracking-tight"
+          onClick={navigateTo("#home")}
+          className="flex items-center gap-2 font-display font-bold text-fog tracking-tight shrink-0"
         >
-          <TerminalSquare className="size-5 text-accent" strokeWidth={2} />
-          <span className="text-[15px]">
+          <span className="size-8 rounded-full bg-gradient-to-br from-accent to-warm flex items-center justify-center">
+            <Sparkles className="size-4 text-ink" strokeWidth={2.5} />
+          </span>
+          <span className="text-[15px] hidden sm:inline">
             {profile.name.split(" ")[0]}
-            <span className="text-accent">.</span>
-            {profile.name.split(" ")[1]}
           </span>
         </a>
 
-        <ul className="hidden md:flex items-center gap-1 font-mono text-[13px]">
+        <ul className="hidden md:flex items-center gap-1 text-sm font-medium">
           {navLinks.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
-                className="group relative px-3 py-2 text-fog-muted hover:text-fog transition-colors"
+                onClick={navigateTo(link.href)}
+                className="px-3.5 py-2 rounded-full text-fog-muted hover:text-fog hover:bg-white/5 transition-colors"
               >
-                <span className="text-accent/70 group-hover:text-accent">
-                  {link.tag}
-                </span>
+                {link.label}
               </a>
             </li>
           ))}
@@ -53,7 +66,8 @@ export default function Navbar() {
 
         <a
           href="#contact"
-          className="hidden md:inline-flex items-center gap-2 rounded-md border border-accent/40 bg-accent/10 px-4 py-2 font-mono text-[13px] text-accent hover:bg-accent/20 transition-colors"
+          onClick={navigateTo("#contact")}
+          className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-soft px-4 py-2 text-sm font-semibold text-ink hover:opacity-90 transition-opacity"
         >
           Hubungi saya
         </a>
@@ -61,31 +75,31 @@ export default function Navbar() {
         <button
           aria-label={open ? "Tutup menu" : "Buka menu"}
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden text-fog p-2 -mr-2"
+          className="md:hidden text-fog p-2 -mr-1"
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
       </nav>
 
       {open && (
-        <div className="md:hidden border-t border-ink-border bg-ink px-5 pb-5 pt-2">
-          <ul className="flex flex-col gap-1 font-mono text-sm">
+        <div className="md:hidden mx-auto max-w-4xl mt-2 rounded-2xl glass px-5 py-4 shadow-xl shadow-black/30">
+          <ul className="flex flex-col gap-1 text-sm font-medium">
             {navLinks.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="block py-2.5 text-fog-muted hover:text-fog transition-colors"
+                  onClick={navigateTo(link.href)}
+                  className="block py-2.5 px-2 rounded-lg text-fog-muted hover:text-fog hover:bg-white/5 transition-colors"
                 >
-                  <span className="text-accent">{link.tag}</span>
+                  {link.label}
                 </a>
               </li>
             ))}
             <li className="pt-2">
               <a
                 href="#contact"
-                onClick={() => setOpen(false)}
-                className="block text-center rounded-md border border-accent/40 bg-accent/10 px-4 py-2.5 text-accent"
+                onClick={navigateTo("#contact")}
+                className="block text-center rounded-full bg-gradient-to-r from-accent to-accent-soft px-4 py-2.5 font-semibold text-ink"
               >
                 Hubungi saya
               </a>

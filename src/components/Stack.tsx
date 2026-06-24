@@ -1,52 +1,67 @@
+"use client";
+
 import { stack } from "@/data/content";
 import { SectionHeading } from "./About";
+import { useSpotlight } from "./useSpotlight";
 
 export default function Stack() {
   return (
-    <section id="stack" className="px-5 sm:px-8 py-20 sm:py-28 bg-ink-panel/40">
+    <section id="stack" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
-          tag="~/stack"
+          eyebrow="Skill"
           title="Tools & teknologi"
           subtitle="Kombinasi yang biasa saya pakai untuk membangun aplikasi dari ujung ke ujung."
         />
 
         <div className="mt-10 grid sm:grid-cols-2 gap-5">
           {stack.map((s) => (
-            <div
-              key={s.group}
-              className="rounded-xl border border-ink-border bg-ink-panel p-6"
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="font-display font-semibold text-fog">
-                  {s.group}
-                </h3>
-                <span className="font-mono text-xs text-mint">
-                  {s.proficiency}%
-                </span>
-              </div>
-
-              <div className="mt-3 h-1.5 w-full rounded-full bg-ink-border overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-accent to-mint"
-                  style={{ width: `${s.proficiency}%` }}
-                />
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {s.tools.map((tool) => (
-                  <span
-                    key={tool}
-                    className="rounded-md border border-ink-border bg-ink px-2.5 py-1 font-mono text-xs text-fog-muted"
-                  >
-                    {tool}
-                  </span>
-                ))}
-              </div>
-            </div>
+            <StackCard key={s.group} {...s} />
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function StackCard({
+  group,
+  tools,
+  proficiency,
+}: {
+  group: string;
+  tools: string[];
+  proficiency: number;
+}) {
+  const spotlight = useSpotlight<HTMLDivElement>();
+  return (
+    <div
+      ref={spotlight.ref}
+      onMouseMove={spotlight.onMouseMove}
+      className="spotlight glass glass-hover rounded-2xl p-6"
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="font-display font-bold text-fog">{group}</h3>
+        <span className="text-xs font-bold text-accent">{proficiency}%</span>
+      </div>
+
+      <div className="mt-3 h-2 w-full rounded-full bg-white/5 overflow-hidden">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-accent to-warm transition-all duration-700"
+          style={{ width: `${proficiency}%` }}
+        />
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {tools.map((tool) => (
+          <span
+            key={tool}
+            className="rounded-full bg-white/[0.04] border border-white/[0.08] px-3 py-1 text-xs text-fog-muted"
+          >
+            {tool}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }

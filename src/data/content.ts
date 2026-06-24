@@ -1,42 +1,41 @@
-// Semua konten portofolio dikumpulkan di sini.
-// Ganti nilai placeholder di bawah dengan data asli Anda.
 
 export const profile = {
-  name: "Ziyad Rifqi Permana",
+  name: "ZiyadRifqi Permana",
   role: "Full Stack Developer",
   location: "Indonesia",
   tagline:
     "Membangun produk web dari struktur data di backend sampai detail interaksi di layar.",
   summary:
     "Saya merancang dan membangun aplikasi web end-to-end — mulai dari arsitektur API dan database, sampai antarmuka yang cepat dan nyaman dipakai. Fokus saya ada di kode yang mudah dirawat dan produk yang benar-benar dipakai orang.",
-  email: "ziyad.rifqi@example.com",
+  email: "ziyadrpe@gmail.com",
   phone: "+62 812-0000-0000",
-  github: "https://github.com/ziyadrifqi",
-  linkedin: "https://linkedin.com/in/ziyadrifqi",
+  github: "https://github.com/Ziyadrifqi",
+  linkedin: "https://www.linkedin.com/in/ziyadrifqi-permana-67bbb827b/",
   cvUrl: "#",
   availableForWork: true,
   photo: "/images/profile.jpg",
+    web3formsAccessKey: "3f96e224-bf28-4a46-9045-4eb7fa42daec",
 };
 
 export const stack = [
   {
     group: "Frontend",
-    tools: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
-    proficiency: 90,
+    tools: ["React", "Next.js", "Tailwind CSS"],
+    proficiency: 80,
   },
   {
     group: "Backend",
-    tools: ["Node.js", "Express", "Laravel", "REST API"],
-    proficiency: 85,
+    tools: ["Laravel", "Codeigniter", "Golang"],
+    proficiency: 90,
   },
   {
     group: "Database",
-    tools: ["PostgreSQL", "MySQL", "MongoDB", "Redis"],
+    tools: ["MySQL", "PostgreSQL"],
     proficiency: 80,
   },
   {
     group: "DevOps & Tools",
-    tools: ["Docker", "Git", "Vercel", "Linux"],
+    tools: ["Docker", "Git"],
     proficiency: 75,
   },
 ];
@@ -48,9 +47,9 @@ export const projects = [
     description:
       "Aplikasi pengelolaan stok untuk bisnis dengan beberapa cabang gudang, lengkap dengan laporan mutasi barang real-time.",
     tech: ["Next.js", "PostgreSQL", "Prisma", "Tailwind CSS"],
-    href: "#",
-    repo: "#",
-    status: "Production",
+    image: "/images/projects/contoh-dashboard.jpg",
+    href: null,
+    repo: null,
   },
   {
     id: "proj-02",
@@ -58,9 +57,9 @@ export const projects = [
     description:
       "Sistem pemesanan jadwal layanan dengan kalender ketersediaan, notifikasi otomatis, dan dashboard admin.",
     tech: ["React", "Node.js", "Express", "MongoDB"],
-    href: "#",
-    repo: "#",
-    status: "Production",
+    image: "/images/projects/placeholder-2.jpg",
+    href: null,
+    repo: null,
   },
   {
     id: "proj-03",
@@ -68,9 +67,9 @@ export const projects = [
     description:
       "Visualisasi data penjualan dengan filter dinamis dan ekspor laporan ke Excel untuk tim manajemen.",
     tech: ["Next.js", "TypeScript", "Recharts", "MySQL"],
-    href: "#",
-    repo: "#",
-    status: "In progress",
+    image: "/images/projects/placeholder-3.jpg",
+    href: null,
+    repo: null,
   },
   {
     id: "proj-04",
@@ -78,18 +77,18 @@ export const projects = [
     description:
       "API headless untuk manajemen konten dengan autentikasi berbasis peran dan dokumentasi otomatis.",
     tech: ["Laravel", "MySQL", "Redis", "Docker"],
-    href: "#",
-    repo: "#",
-    status: "Production",
+    image: "/images/projects/placeholder-4.jpg",
+    href: null,
+    repo: null,
   },
 ];
 
 export const experience = [
   {
     id: "exp-01",
-    role: "Full Stack Developer",
-    company: "Nama Perusahaan",
-    period: "2023 — Sekarang",
+    role: "Information and System Technology Intern",
+    company: "PT Jakarta Lingko Indonesia",
+    period: "Nov 2025 — Mei 2026",
     description:
       "Mengembangkan dan memelihara beberapa aplikasi internal, bertanggung jawab pada arsitektur API serta optimasi performa frontend.",
     highlights: [
@@ -108,18 +107,6 @@ export const experience = [
     highlights: [
       "Mengimplementasikan fitur autentikasi dan manajemen pengguna",
       "Menulis dokumentasi teknis untuk API internal",
-    ],
-  },
-  {
-    id: "exp-03",
-    role: "Freelance Web Developer",
-    company: "Mandiri",
-    period: "2020 — 2021",
-    description:
-      "Mengerjakan proyek website untuk UMKM dan organisasi lokal, dari landing page sampai sistem sederhana.",
-    highlights: [
-      "Menyelesaikan lebih dari 10 proyek website untuk klien lokal",
-      "Menangani seluruh proses dari diskusi kebutuhan sampai deployment",
     ],
   },
 ];
