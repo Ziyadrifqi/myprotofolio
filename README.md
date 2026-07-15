@@ -1,6 +1,6 @@
-# Portfolio jadi dinamis — Express.js + MySQL
+# Portfolio Next.js — Express.js + MySQL
 
-Struktur ini asumsinya ditaruh **di dalam repo Next.js kamu yang sekarang**, sebagai folder `server/` di root project (sejajar dengan folder `src/`).
+Struktur ini asumsinya ditaruh **di dalam repo Next.js**, sebagai folder `server/` di root project (sejajar dengan folder `src/`).
 
 ```
 your-portfolio/
@@ -15,14 +15,14 @@ your-portfolio/
 ## 1. Pasang backend
 
 ```bash
-# dari root project Next.js kamu
+# dari root project Next.js
 cp -r server ./server
 cd server
 npm install
 cp .env.example .env
 ```
 
-Edit `server/.env`, isi kredensial MySQL kamu (`DB_USER`, `DB_PASSWORD`, dll).
+Edit `server/.env`, isi kredensial MySQL (`DB_USER`, `DB_PASSWORD`, dll).
 
 ## 2. Buat database & tabel
 
