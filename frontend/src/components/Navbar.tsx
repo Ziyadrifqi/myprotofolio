@@ -42,9 +42,9 @@ export default function Navbar() {
           onClick={navigateTo("#home")}
           className="flex items-center gap-2 font-display font-bold text-fog tracking-tight shrink-0"
         >
-          <span className="size-8 rounded-full bg-gradient-to-br from-accent to-warm flex items-center justify-center">
-            <Sparkles className="size-4 text-ink" strokeWidth={2.5} />
-          </span>
+          <span className="size-8 rounded-full bg-gradient-to-br from-accent to-warm flex items-center justify-center text-ink font-bold text-sm">
+  ZR
+</span>
           <span className="text-[15px] hidden sm:inline">
             {profile.name.split(" ")[0]}
           </span>

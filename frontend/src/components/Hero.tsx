@@ -45,6 +45,7 @@ export default function Hero() {
             </a>
             <a
               href={profile.cvUrl}
+               target="_blank"
               className="inline-flex items-center gap-2 rounded-full glass px-6 py-3.5 text-sm font-semibold text-fog hover:border-accent/40 transition-colors"
             >
               Unduh CV
@@ -99,8 +100,7 @@ export default function Hero() {
               <p className="mt-1 text-sm text-fog-muted">{profile.location}</p>
             </div>
 
-            <div className="mt-6 grid grid-cols-3 gap-2 text-center">
-              <Stat label="Stack" value="Next.js" />
+            <div className="mt-4 grid grid-cols-2 gap-2 text-center">
               <Stat label="Fokus" value="Full Stack" />
               <Stat label="Status" value="Available" accent />
             </div>

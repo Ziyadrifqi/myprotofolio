@@ -17,11 +17,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Ziyad Rifqi Permana — Full Stack Developer",
+  title: "ZiyadRifqi Permana — Full Stack Developer",
+   icons: {
+    icon: "/images/foto.png",
+  },
   description:
     "Portofolio Ziyad Rifqi Permana, Full Stack Developer yang membangun produk web dari sistem backend sampai pengalaman antarmuka.",
   keywords: [
-    "Ziyad Rifqi Permana",
+    "ZiyadRifqi Permana",
     "Full Stack Developer",
     "Web Developer Indonesia",
     "Next.js Developer",

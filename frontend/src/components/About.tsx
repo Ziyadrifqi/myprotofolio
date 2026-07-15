@@ -42,7 +42,7 @@ export default function About() {
           </div>
 
           <div>
-            <p className="text-lg sm:text-xl text-fog leading-relaxed font-medium max-w-2xl">
+            <p className="text-lg sm:text-xl text-fog leading-relaxed font-medium max-w-2xl text-justify">
               {profile.summary}
             </p>
 
@@ -78,7 +78,7 @@ function PillarCard({
         <Icon className="size-5 text-accent" strokeWidth={1.8} />
       </div>
       <h3 className="mt-4 font-display font-bold text-fog">{title}</h3>
-      <p className="mt-1.5 text-sm text-fog-muted leading-relaxed">{desc}</p>
+      <p className="mt-1.5 text-sm text-fog-muted leading-relaxed text-justify">{desc}</p>
     </div>
   );
 }
@@ -97,7 +97,7 @@ export function SectionHeading({
       <span className="pill-border inline-flex items-center rounded-full bg-ink-panel/60 px-3.5 py-1 text-xs font-semibold text-accent">
         {eyebrow}
       </span>
-      <h2 className="mt-4 font-display text-2xl sm:text-3xl font-extrabold text-fog tracking-tight">
+      <h2 className="mt-4 font-display text-2xl sm:text-3xl font-extrabold text-fog tracking-tight ">
         {title}
       </h2>
       {subtitle && (

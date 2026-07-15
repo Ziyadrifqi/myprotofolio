@@ -54,7 +54,7 @@ function ExperienceCard({
         </span>
       </div>
 
-      <p className="mt-3 text-sm text-fog-muted leading-relaxed max-w-2xl">
+      <p className="mt-3 text-sm text-fog-muted leading-relaxed max-w-2xl text-justify">
         {description}
       </p>
 

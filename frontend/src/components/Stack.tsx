@@ -9,9 +9,9 @@ export default function Stack() {
     <section id="stack" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
-          eyebrow="Skill"
-          title="Tools & teknologi"
-          subtitle="Kombinasi yang biasa saya pakai untuk membangun aplikasi dari ujung ke ujung."
+         eyebrow="Keahlian"
+title="Teknologi yang saya gunakan"
+subtitle="Berbagai tools dan teknologi yang saya manfaatkan untuk mengembangkan aplikasi web modern, mulai dari backend hingga frontend."
         />
 
         <div className="mt-10 grid sm:grid-cols-2 gap-5">

@@ -96,7 +96,7 @@ function ProjectCard({
           )}
         </div>
 
-        <p className="mt-2 text-sm text-fog-muted leading-relaxed">
+        <p className="mt-2 text-sm text-fog-muted leading-relaxed text-justify">
           {description}
         </p>
 

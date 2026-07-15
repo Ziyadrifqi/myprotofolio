@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio jadi dinamis — Express.js + MySQL
 
-## Getting Started
+Struktur ini asumsinya ditaruh **di dalam repo Next.js kamu yang sekarang**, sebagai folder `server/` di root project (sejajar dengan folder `src/`).
 
-First, run the development server:
+```
+your-portfolio/
+├── server/              ← backend Express baru (dari folder server/ di sini)
+├── src/
+│   ├── app/page.tsx     ← replace dengan frontend-updates/src/app/page.tsx
+│   ├── components/      ← replace file yang namanya sama
+│   └── lib/api.ts       ← file baru, dari frontend-updates/src/lib/api.ts
+└── ...
+```
+
+## 1. Pasang backend
+
+```bash
+# dari root project Next.js kamu
+cp -r server ./server
+cd server
+npm install
+cp .env.example .env
+```
+
+Edit `server/.env`, isi kredensial MySQL kamu (`DB_USER`, `DB_PASSWORD`, dll).
+
+## 2. Buat database & tabel
+
+```bash
+mysql -u root -p < src/schema.sql
+```
+
+Ini otomatis bikin database `portfolio_db` beserta tabel `profile`, `stack_groups`, `projects`, `experience`, `nav_links`.
+
+## 3. Isi data awal (seed)
+
+Data yang sebelumnya hardcode di `src/data/content.ts` sudah dipindahkan ke `server/src/seed.js`, isinya sama persis. Jalankan:
+
+```bash
+npm run seed
+```
+
+## 4. Jalankan backend
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Portfolio API running on http://localhost:4000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Cek: `http://localhost:4000/api/portfolio` harus mengembalikan JSON berisi profile, stack, projects, experience, navLinks.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 5. Update frontend Next.js
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy file-file di `frontend-updates/` ke lokasi yang sama di project Next.js kamu (timpa file lama):
 
-## Learn More
+- `src/lib/api.ts` (baru)
+- `src/app/page.tsx`
+- `src/components/Navbar.tsx`
+- `src/components/Hero.tsx`
+- `src/components/About.tsx`
+- `src/components/Stack.tsx`
+- `src/components/Projects.tsx`
+- `src/components/Experience.tsx`
+- `src/components/Contact.tsx`
+- `src/components/Footer.tsx`
 
-To learn more about Next.js, take a look at the following resources:
+Lalu tambahkan `.env.local` di root project Next.js (isi dari `frontend-updates/.env.local.example`):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=3f96e224-bf28-4a46-9045-4eb7fa42daec
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`src/data/content.ts` sudah tidak dipakai lagi — boleh dihapus setelah kamu pastikan semua komponen sudah pakai data dari API.
 
-## Deploy on Vercel
+## 6. Jalankan Next.js
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Homepage sekarang mengambil semua data (profile, stack, projects, experience, nav links) dari backend Express saat request masuk, dengan cache 60 detik (`revalidate: 60` di `getPortfolioData`) supaya tidak membebani database di tiap request.
+
+## Cara kerja singkat
+
+- **`GET /api/portfolio`** — satu endpoint gabungan, dipanggil oleh `page.tsx` (Server Component) di server, bukan dari browser.
+- Endpoint terpisah (`/api/profile`, `/api/stack`, `/api/projects`, `/api/experience`, `/api/nav-links`) juga tersedia kalau nanti kamu butuh fetch granular, misalnya untuk halaman admin.
+- Form kontak tetap pakai Web3Forms langsung dari browser (tidak lewat backend) — key-nya sekarang jadi env var publik, bukan hardcode di kode seperti sebelumnya.
+- Kolom `tech`, `tools`, `highlights` disimpan sebagai `JSON` di MySQL supaya strukturnya tetap array seperti versi lama, tanpa perlu tabel relasi tambahan.
+
+## Kalau nanti mau tambah panel admin
+
+Struktur di atas sudah siap untuk itu — tinggal tambah route `POST/PUT/DELETE` di masing-masing file `server/src/routes/*.js` (sekarang baru `GET`), plus halaman admin terpisah di Next.js yang manggil endpoint-endpoint itu. Bilang aja kalau mau saya bikinkan sekalian.
