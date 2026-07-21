@@ -1,10 +1,10 @@
 "use client";
 
-import { experience } from "@/data/content";
+import type { Experience as ExperienceItem } from "@/lib/api";
 import { SectionHeading } from "./About";
 import { useSpotlight } from "./useSpotlight";
 
-export default function Experience() {
+export default function Experience({ experience }: { experience: ExperienceItem[] }) {
   return (
     <section id="experience" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
@@ -30,13 +30,7 @@ function ExperienceCard({
   period,
   description,
   highlights,
-}: {
-  role: string;
-  company: string;
-  period: string;
-  description: string;
-  highlights: string[];
-}) {
+}: ExperienceItem) {
   const spotlight = useSpotlight<HTMLDivElement>();
   return (
     <div

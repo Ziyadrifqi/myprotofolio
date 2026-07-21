@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { profile } from "@/data/content";
+import type { Profile } from "@/lib/api";
 import { GithubIcon, LinkedinIcon } from "./icons";
 import { useSpotlight } from "./useSpotlight";
 
-export default function Hero() {
+export default function Hero({ profile }: { profile: Profile }) {
   const spotlight = useSpotlight<HTMLDivElement>();
 
   return (

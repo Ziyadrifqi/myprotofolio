@@ -1,11 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, Sparkles, X } from "lucide-react";
-import { navLinks, profile } from "@/data/content";
+import { Menu, X } from "lucide-react";
+import type { NavLink, Profile } from "@/lib/api";
 import { usePreloader } from "./PreloaderContext";
 
-export default function Navbar() {
+export default function Navbar({
+  profile,
+  navLinks,
+}: {
+  profile: Profile;
+  navLinks: NavLink[];
+}) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { trigger } = usePreloader();

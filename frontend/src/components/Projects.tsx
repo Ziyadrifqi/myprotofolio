@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { projects } from "@/data/content";
+import type { Project } from "@/lib/api";
 import { SectionHeading } from "./About";
 import { GithubIcon } from "./icons";
 import { useSpotlight } from "./useSpotlight";
 
-export default function Projects() {
+export default function Projects({ projects }: { projects: Project[] }) {
   return (
     <section id="projects" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
@@ -34,14 +34,7 @@ function ProjectCard({
   image,
   href,
   repo,
-}: {
-  title: string;
-  description: string;
-  tech: string[];
-  image: string;
-  href?: string | null;
-  repo?: string | null;
-}) {
+}: Project) {
   const spotlight = useSpotlight<HTMLDivElement>();
   const hasLinks = Boolean(href || repo);
 

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Code2, Layers, Rocket } from "lucide-react";
-import { profile } from "@/data/content";
+import type { Profile } from "@/lib/api";
 import { useSpotlight } from "./useSpotlight";
 
 const pillars = [
@@ -23,7 +23,7 @@ const pillars = [
   },
 ];
 
-export default function About() {
+export default function About({ profile }: { profile: Profile }) {
   return (
     <section id="about" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">

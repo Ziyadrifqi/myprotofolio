@@ -6,20 +6,23 @@ import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import { getPortfolioData } from "@/lib/api";
 
-export default function Home() {
+export default async function Home() {
+  const { profile, stack, projects, experience, navLinks } = await getPortfolioData();
+
   return (
     <>
-      <Navbar />
+      <Navbar profile={profile} navLinks={navLinks} />
       <main>
-        <Hero />
-        <About />
-        <Stack />
-        <Projects />
-        <Experience />
-        <Contact />
+        <Hero profile={profile} />
+        <About profile={profile} />
+        <Stack stack={stack} />
+        <Projects projects={projects} />
+        <Experience experience={experience} />
+        <Contact profile={profile} />
       </main>
-      <Footer />
+      <Footer profile={profile} />
     </>
   );
 }

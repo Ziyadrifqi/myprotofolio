@@ -1,6 +1,7 @@
 const express = require("express");
 const pool = require("../db");
 const requireAuth = require("../middleware/auth");
+const { deleteIfUploaded } = require("../utils/fileStorage");
 
 const router = express.Router();
 
@@ -59,10 +60,17 @@ router.put("/:id", requireAuth, async (req, res) => {
     return res.status(400).json({ error: "title, description, and tech[] are required" });
   }
   try {
+    const [[existing]] = await pool.query("SELECT image FROM projects WHERE id=?", [req.params.id]);
+
     await pool.query(
       `UPDATE projects SET title=?, description=?, tech=?, image=?, href=?, repo=? WHERE id=?`,
       [title, description, JSON.stringify(tech), image || null, href || null, repo || null, req.params.id]
     );
+
+    if (existing && existing.image && existing.image !== image) {
+      deleteIfUploaded(existing.image);
+    }
+
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -73,7 +81,9 @@ router.put("/:id", requireAuth, async (req, res) => {
 // DELETE /api/projects/:id
 router.delete("/:id", requireAuth, async (req, res) => {
   try {
+    const [[existing]] = await pool.query("SELECT image FROM projects WHERE id=?", [req.params.id]);
     await pool.query("DELETE FROM projects WHERE id=?", [req.params.id]);
+    if (existing) deleteIfUploaded(existing.image);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);

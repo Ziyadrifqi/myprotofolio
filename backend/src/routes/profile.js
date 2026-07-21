@@ -1,6 +1,7 @@
 const express = require("express");
 const pool = require("../db");
 const requireAuth = require("../middleware/auth");
+const { deleteIfUploaded } = require("../utils/fileStorage");
 
 const router = express.Router();
 
@@ -56,7 +57,7 @@ router.put("/", requireAuth, async (req, res) => {
   }
 
   try {
-    const [existing] = await pool.query("SELECT id FROM profile ORDER BY id DESC LIMIT 1");
+    const [existing] = await pool.query("SELECT id, photo FROM profile ORDER BY id DESC LIMIT 1");
 
     if (existing.length) {
       await pool.query(
@@ -67,6 +68,9 @@ router.put("/", requireAuth, async (req, res) => {
           github, linkedin, cvUrl, Boolean(availableForWork), photo, existing[0].id,
         ]
       );
+      if (existing[0].photo && existing[0].photo !== photo) {
+        deleteIfUploaded(existing[0].photo);
+      }
     } else {
       await pool.query(
         `INSERT INTO profile (name, role, location, tagline, summary, email, phone, github, linkedin, cv_url, available_for_work, photo)

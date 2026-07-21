@@ -1,10 +1,10 @@
 "use client";
 
-import { stack } from "@/data/content";
+import type { StackGroup } from "@/lib/api";
 import { SectionHeading } from "./About";
 import { useSpotlight } from "./useSpotlight";
 
-export default function Stack() {
+export default function Stack({ stack }: { stack: StackGroup[] }) {
   return (
     <section id="stack" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">

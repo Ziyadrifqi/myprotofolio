@@ -2,13 +2,17 @@
 
 import { useState } from "react";
 import { Loader2, Mail, MapPin, Send } from "lucide-react";
-import { profile } from "@/data/content";
+import type { Profile } from "@/lib/api";
 import { SectionHeading } from "./About";
 import { GithubIcon, LinkedinIcon } from "./icons";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-export default function Contact() {
+// Web3Forms key is meant to be public (it's a submit-only widget key), so it
+// stays as a NEXT_PUBLIC_ env var rather than coming from the backend API.
+const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY || "";
+
+export default function Contact({ profile }: { profile: Profile }) {
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [errorMessage, setErrorMessage] = useState("");
@@ -22,13 +26,10 @@ export default function Contact() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (
-      !profile.web3formsAccessKey ||
-      profile.web3formsAccessKey === "GANTI_DENGAN_ACCESS_KEY_ANDA"
-    ) {
+    if (!WEB3FORMS_ACCESS_KEY) {
       setStatus("error");
       setErrorMessage(
-        "Form belum terhubung ke layanan email. Tambahkan Access Key Web3Forms di src/data/content.ts."
+        "Form belum terhubung ke layanan email. Tambahkan NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY di .env.local."
       );
       return;
     }
@@ -44,7 +45,7 @@ export default function Contact() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          access_key: profile.web3formsAccessKey,
+          access_key: WEB3FORMS_ACCESS_KEY,
           subject: `Pesan baru dari ${form.name} — Portofolio`,
           name: form.name,
           email: form.email,
