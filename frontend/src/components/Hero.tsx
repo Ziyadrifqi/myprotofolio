@@ -1,13 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Copy, Sparkles } from "lucide-react";
 import type { Profile } from "@/lib/api";
-import { GithubIcon, LinkedinIcon } from "./icons";
+import { GithubIcon, LinkedinIcon, WhatsAppIcon } from "./icons";
 import { useSpotlight } from "./useSpotlight";
 
 export default function Hero({ profile }: { profile: Profile }) {
-  const spotlight = useSpotlight<HTMLDivElement>();
+  const { onMouseMove } = useSpotlight();
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
+  function handleCopyEmail() {
+    navigator.clipboard.writeText(profile.email);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
+  }
+
+  const waPhone = (profile.phone || "6281200000000").replace(/[^0-9]/g, "");
+  const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(
+    "Halo Ziyad, saya melihat portofolio Anda dan tertarik untuk berdiskusi tentang peluang proyek/kerja sama."
+  )}`;
 
   return (
     <section
@@ -45,19 +58,21 @@ export default function Hero({ profile }: { profile: Profile }) {
             </a>
             <a
               href={profile.cvUrl}
-               target="_blank"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full glass px-6 py-3.5 text-sm font-semibold text-fog hover:border-accent/40 transition-colors"
             >
               Unduh CV
             </a>
           </div>
 
-          <div className="mt-8 flex items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
               href={profile.github}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
+              title="Kunjungi GitHub"
               className="size-10 rounded-full glass flex items-center justify-center text-fog-muted hover:text-accent hover:border-accent/40 transition-colors"
             >
               <GithubIcon className="size-4.5" />
@@ -67,18 +82,52 @@ export default function Hero({ profile }: { profile: Profile }) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"
+              title="Kunjungi LinkedIn"
               className="size-10 rounded-full glass flex items-center justify-center text-fog-muted hover:text-accent hover:border-accent/40 transition-colors"
             >
               <LinkedinIcon className="size-4.5" />
             </a>
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
+              title="Hubungi di WhatsApp"
+              className="size-10 rounded-full glass flex items-center justify-center text-fog-muted hover:text-[#25D366] hover:border-[#25D366]/40 transition-colors"
+            >
+              <WhatsAppIcon className="size-4.5" />
+            </a>
+
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              aria-label="Salin email"
+              title={copiedEmail ? "Email tersalin!" : "Salin email ke clipboard"}
+              className={`h-10 px-4 rounded-full glass flex items-center gap-2 text-xs font-semibold transition-all ${
+                copiedEmail
+                  ? "bg-accent/20 border-accent/40 text-accent"
+                  : "text-fog-muted hover:text-fog hover:border-accent/40"
+              }`}
+            >
+              {copiedEmail ? (
+                <>
+                  <Check className="size-3.5 text-accent" />
+                  <span>Email tersalin!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="size-3.5" />
+                  <span>Salin email</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 
         {/* Right: glass spotlight card with photo */}
         <div className="animate-float-slow">
           <div
-            ref={spotlight.ref}
-            onMouseMove={spotlight.onMouseMove}
+            onMouseMove={onMouseMove}
             className="spotlight glass rounded-[2rem] p-8 sm:p-10 shadow-2xl shadow-black/40"
           >
             <div className="relative mx-auto size-40 sm:size-48">

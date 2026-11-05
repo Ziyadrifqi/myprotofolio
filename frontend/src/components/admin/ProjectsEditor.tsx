@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { AlertCircle, Pencil, Plus, Trash2 } from "lucide-react";
 import { authFetch } from "@/lib/adminApi";
 import Modal from "./Modal";
 import ImageUploader from "./ImageUploader";
@@ -38,19 +38,41 @@ export default function ProjectsEditor() {
 
   function load() {
     authFetch("/api/projects")
-      .then((r) => r.json())
-      .then(setRows)
-      .catch(() => setError("Gagal memuat data projects"));
+      .then(async (r) => {
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}));
+          throw new Error(body.error || `Server error (${r.status})`);
+        }
+        return r.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setRows(data);
+          setError("");
+        } else {
+          setRows([]);
+        }
+      })
+      .catch((err) => {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Gagal memuat data projects. Pastikan backend Express dan MySQL aktif."
+        );
+        setRows([]); // Ensure rows is always an array
+      });
   }
 
-  useEffect(load, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   function openEdit(row: ProjectRow) {
     setEditing(row);
     setForm({
       title: row.title,
       description: row.description,
-      tech: row.tech.join(", "),
+      tech: Array.isArray(row.tech) ? row.tech.join(", ") : "",
       image: row.image,
       href: row.href || "",
       repo: row.repo || "",
@@ -59,7 +81,7 @@ export default function ProjectsEditor() {
 
   function openCreate() {
     setCreating(true);
-    setForm({ ...EMPTY_FORM, image: "/images/projects/placeholder-4.jpg" });
+    setForm({ ...EMPTY_FORM, image: "/uploads/projects/placeholder-4.jpg" });
   }
 
   function closeModal() {
@@ -102,7 +124,10 @@ export default function ProjectsEditor() {
           }),
         });
       }
-      if (!res.ok) throw new Error((await res.json()).error || "Gagal menyimpan");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Gagal menyimpan");
+      }
       closeModal();
       load();
     } catch (err) {
@@ -114,12 +139,22 @@ export default function ProjectsEditor() {
 
   async function handleDelete(dbId: number) {
     if (!confirm("Hapus proyek ini?")) return;
-    const res = await authFetch(`/api/projects/${dbId}`, { method: "DELETE" });
-    if (res.ok) setRows((r) => r && r.filter((x) => x.dbId !== dbId));
-    else setError("Gagal menghapus proyek");
+    try {
+      const res = await authFetch(`/api/projects/${dbId}`, { method: "DELETE" });
+      if (res.ok) {
+        setRows((r) => (r ? r.filter((x) => x.dbId !== dbId) : []));
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setError(body.error || "Gagal menghapus proyek");
+      }
+    } catch {
+      setError("Gagal menghapus proyek. Periksa koneksi backend.");
+    }
   }
 
-  if (!rows) return <p className="text-sm text-fog-muted">Memuat...</p>;
+  if (rows === null) {
+    return <p className="text-sm text-fog-muted">Memuat data proyek...</p>;
+  }
 
   return (
     <div>
@@ -127,15 +162,20 @@ export default function ProjectsEditor() {
         <p className="text-sm text-fog-muted">{rows.length} proyek</p>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-soft px-4 py-2 text-xs font-semibold text-ink"
+          className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-soft px-4 py-2 text-xs font-semibold text-ink shadow-md shadow-accent/20 hover:scale-[1.02] transition-transform"
         >
           <Plus className="size-3.5" /> Tambah proyek
         </button>
       </div>
 
-      {error && !editing && !creating && <p className="text-xs text-warm font-medium mb-3">{error}</p>}
+      {error && !editing && !creating && (
+        <div className="mb-4 flex items-center gap-2 rounded-xl bg-warm/10 border border-warm/25 px-4 py-3 text-xs text-warm">
+          <AlertCircle className="size-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
 
-      <div className="rounded-2xl border border-ink-border overflow-hidden">
+      <div className="rounded-2xl border border-ink-border overflow-hidden bg-ink-panel/30">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-ink-panel-light/50 text-left text-xs text-fog-muted uppercase tracking-wide">
@@ -152,7 +192,9 @@ export default function ProjectsEditor() {
                   <p className="truncate">{row.title}</p>
                 </td>
                 <td className="px-4 py-3 text-fog-muted max-w-[200px]">
-                  <p className="truncate">{row.tech.join(", ")}</p>
+                  <p className="truncate">
+                    {Array.isArray(row.tech) ? row.tech.join(", ") : ""}
+                  </p>
                 </td>
                 <td className="px-4 py-3 text-fog-muted">
                   {row.href || row.repo ? "Ada" : "—"}
@@ -180,7 +222,7 @@ export default function ProjectsEditor() {
             {rows.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-8 text-center text-fog-muted text-sm">
-                  Belum ada data.
+                  Belum ada data proyek.
                 </td>
               </tr>
             )}

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Mail, MapPin, Send } from "lucide-react";
+import { Check, Copy, Loader2, Mail, MapPin, Send } from "lucide-react";
 import type { Profile } from "@/lib/api";
 import { SectionHeading } from "./About";
-import { GithubIcon, LinkedinIcon } from "./icons";
+import { GithubIcon, LinkedinIcon, WhatsAppIcon } from "./icons";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -77,10 +77,11 @@ export default function Contact({ profile }: { profile: Profile }) {
           subtitle="Punya proyek atau peluang kolaborasi? Kirim pesan, saya akan balas secepatnya."
         />
 
-        <div className="mt-10 grid lg:grid-cols-[0.8fr_1.2fr] gap-6">
-          {/* Contact info */}
-          <div className="space-y-4">
-            <InfoRow icon={Mail} label="Email" value={profile.email} href={`mailto:${profile.email}`} />
+        <div className="mt-10 grid lg:grid-cols-[0.85fr_1.15fr] gap-6">
+          {/* Contact info list */}
+          <div className="space-y-3.5">
+            <EmailRow email={profile.email} />
+            <WhatsAppRow phone={profile.phone} />
             <InfoRow icon={MapPin} label="Lokasi" value={profile.location} />
             <InfoRow icon={GithubIcon} label="GitHub" value="@ziyadrifqi" href={profile.github} />
             <InfoRow icon={LinkedinIcon} label="LinkedIn" value="ziyadrifqi" href={profile.linkedin} />
@@ -97,7 +98,7 @@ export default function Contact({ profile }: { profile: Profile }) {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                placeholder="Nama Anda"
+                placeholder="Masukkan Nama Anda"
                 required
               />
               <Field
@@ -106,7 +107,7 @@ export default function Contact({ profile }: { profile: Profile }) {
                 type="email"
                 value={form.email}
                 onChange={handleChange}
-                placeholder="email@anda.com"
+                placeholder="Masukkan Email Anda"
                 required
               />
             </div>
@@ -125,7 +126,7 @@ export default function Contact({ profile }: { profile: Profile }) {
                 onChange={handleChange}
                 required
                 rows={5}
-                placeholder="Ceritakan tentang proyek Anda..."
+                placeholder="Ceritakan tentang proyek atau tawaran peluang Anda..."
                 suppressHydrationWarning
                 className="w-full rounded-xl bg-white/[0.03] border border-white/[0.08] px-4 py-3 text-sm text-fog placeholder:text-fog-muted/60 focus:border-accent/50 outline-none transition-colors resize-none"
               />
@@ -167,6 +168,97 @@ export default function Contact({ profile }: { profile: Profile }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function EmailRow({ email }: { email: string }) {
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="glass glass-hover rounded-2xl p-4 flex items-center justify-between gap-3 group">
+      <a
+        href={`mailto:${email}`}
+        className="flex items-center gap-4 flex-1 min-w-0"
+        title="Kirim email langsung"
+      >
+        <div className="shrink-0 size-11 rounded-xl bg-gradient-to-br from-accent/20 to-warm/10 flex items-center justify-center">
+          <Mail className="size-4.5 text-accent" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold text-fog-muted uppercase tracking-wide">
+            Email
+          </p>
+          <p className="text-sm text-fog truncate group-hover:text-accent transition-colors">
+            {email}
+          </p>
+        </div>
+      </a>
+
+      <button
+        type="button"
+        onClick={handleCopy}
+        aria-label="Salin email"
+        title={copied ? "Email tersalin!" : "Salin alamat email"}
+        className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${copied
+          ? "bg-accent text-ink"
+          : "bg-white/[0.04] border border-white/[0.08] text-fog-muted hover:text-fog hover:border-accent/40"
+          }`}
+      >
+        {copied ? (
+          <>
+            <Check className="size-3.5" />
+            <span>Tersalin</span>
+          </>
+        ) : (
+          <>
+            <Copy className="size-3.5" />
+            <span className="hidden sm:inline">Salin</span>
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
+
+function WhatsAppRow({ phone }: { phone?: string }) {
+  if (!phone) return null;
+  const cleanPhone = phone.replace(/[^0-9]/g, "");
+  const waUrl = `https://wa.me/${cleanPhone || "6288225801565"}?text=${encodeURIComponent(
+    "Halo Ziyad, saya tertarik mendiskusikan peluang kerja sama atau proyek dengan Anda."
+  )}`;
+
+  return (
+    <a
+      href={waUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="glass glass-hover rounded-2xl p-4 flex items-center justify-between gap-3 group block"
+    >
+      <div className="flex items-center gap-4 min-w-0">
+        <div className="shrink-0 size-11 rounded-xl bg-[#25D366]/15 flex items-center justify-center border border-[#25D366]/25">
+          <WhatsAppIcon className="size-5 text-[#25D366]" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold text-fog-muted uppercase tracking-wide">
+            WhatsApp
+          </p>
+          <p className="text-sm text-fog group-hover:text-[#25D366] transition-colors">
+            Chat Langsung di WhatsApp
+          </p>
+        </div>
+      </div>
+      <span className="shrink-0 text-xs font-semibold text-[#25D366] bg-[#25D366]/10 border border-[#25D366]/25 rounded-full px-3 py-1 group-hover:bg-[#25D366]/20 transition-colors">
+        Chat ↗
+      </span>
+    </a>
   );
 }
 

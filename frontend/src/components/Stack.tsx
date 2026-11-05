@@ -9,9 +9,9 @@ export default function Stack({ stack }: { stack: StackGroup[] }) {
     <section id="stack" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
-         eyebrow="Keahlian"
-title="Teknologi yang saya gunakan"
-subtitle="Berbagai tools dan teknologi yang saya manfaatkan untuk mengembangkan aplikasi web modern, mulai dari backend hingga frontend."
+          eyebrow="Keahlian"
+          title="Teknologi yang saya gunakan"
+          subtitle="Berbagai tools dan teknologi yang saya manfaatkan untuk mengembangkan aplikasi web modern, mulai dari backend hingga frontend."
         />
 
         <div className="mt-10 grid sm:grid-cols-2 gap-5">
@@ -33,11 +33,10 @@ function StackCard({
   tools: string[];
   proficiency: number;
 }) {
-  const spotlight = useSpotlight<HTMLDivElement>();
+  const { onMouseMove } = useSpotlight();
   return (
     <div
-      ref={spotlight.ref}
-      onMouseMove={spotlight.onMouseMove}
+      onMouseMove={onMouseMove}
       className="spotlight glass glass-hover rounded-2xl p-6"
     >
       <div className="flex items-center justify-between">

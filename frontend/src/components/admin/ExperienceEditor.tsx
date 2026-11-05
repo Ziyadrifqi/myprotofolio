@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { AlertCircle, Pencil, Plus, Trash2 } from "lucide-react";
 import { authFetch } from "@/lib/adminApi";
 import Modal from "./Modal";
 
@@ -35,12 +35,34 @@ export default function ExperienceEditor() {
 
   function load() {
     authFetch("/api/experience")
-      .then((r) => r.json())
-      .then(setRows)
-      .catch(() => setError("Gagal memuat data experience"));
+      .then(async (r) => {
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}));
+          throw new Error(body.error || `Server error (${r.status})`);
+        }
+        return r.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setRows(data);
+          setError("");
+        } else {
+          setRows([]);
+        }
+      })
+      .catch((err) => {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Gagal memuat data experience. Pastikan backend Express dan MySQL aktif."
+        );
+        setRows([]); // Ensure rows is always an array so .map never crashes
+      });
   }
 
-  useEffect(load, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   function openEdit(row: ExperienceRow) {
     setEditing(row);
@@ -49,7 +71,7 @@ export default function ExperienceEditor() {
       company: row.company,
       period: row.period,
       description: row.description,
-      highlights: row.highlights.join("\n"),
+      highlights: Array.isArray(row.highlights) ? row.highlights.join("\n") : "",
     });
   }
 
@@ -68,7 +90,10 @@ export default function ExperienceEditor() {
     e.preventDefault();
     setSaving(true);
     setError("");
-    const highlights = form.highlights.split("\n").map((h) => h.trim()).filter(Boolean);
+    const highlights = form.highlights
+      .split("\n")
+      .map((h) => h.trim())
+      .filter(Boolean);
 
     try {
       let res: Response;
@@ -96,7 +121,10 @@ export default function ExperienceEditor() {
           }),
         });
       }
-      if (!res.ok) throw new Error((await res.json()).error || "Gagal menyimpan");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Gagal menyimpan");
+      }
       closeModal();
       load();
     } catch (err) {
@@ -108,12 +136,22 @@ export default function ExperienceEditor() {
 
   async function handleDelete(dbId: number) {
     if (!confirm("Hapus pengalaman ini?")) return;
-    const res = await authFetch(`/api/experience/${dbId}`, { method: "DELETE" });
-    if (res.ok) setRows((r) => r && r.filter((x) => x.dbId !== dbId));
-    else setError("Gagal menghapus pengalaman");
+    try {
+      const res = await authFetch(`/api/experience/${dbId}`, { method: "DELETE" });
+      if (res.ok) {
+        setRows((r) => (r ? r.filter((x) => x.dbId !== dbId) : []));
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setError(body.error || "Gagal menghapus pengalaman");
+      }
+    } catch {
+      setError("Gagal menghapus pengalaman. Periksa koneksi ke backend.");
+    }
   }
 
-  if (!rows) return <p className="text-sm text-fog-muted">Memuat...</p>;
+  if (rows === null) {
+    return <p className="text-sm text-fog-muted">Memuat data pengalaman...</p>;
+  }
 
   return (
     <div>
@@ -121,15 +159,20 @@ export default function ExperienceEditor() {
         <p className="text-sm text-fog-muted">{rows.length} pengalaman</p>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-soft px-4 py-2 text-xs font-semibold text-ink"
+          className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-soft px-4 py-2 text-xs font-semibold text-ink shadow-md shadow-accent/20 hover:scale-[1.02] transition-transform"
         >
           <Plus className="size-3.5" /> Tambah pengalaman
         </button>
       </div>
 
-      {error && !editing && !creating && <p className="text-xs text-warm font-medium mb-3">{error}</p>}
+      {error && !editing && !creating && (
+        <div className="mb-4 flex items-center gap-2 rounded-xl bg-warm/10 border border-warm/25 px-4 py-3 text-xs text-warm">
+          <AlertCircle className="size-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
 
-      <div className="rounded-2xl border border-ink-border overflow-hidden">
+      <div className="rounded-2xl border border-ink-border overflow-hidden bg-ink-panel/30">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-ink-panel-light/50 text-left text-xs text-fog-muted uppercase tracking-wide">
@@ -170,7 +213,7 @@ export default function ExperienceEditor() {
             {rows.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-8 text-center text-fog-muted text-sm">
-                  Belum ada data.
+                  Belum ada data pengalaman.
                 </td>
               </tr>
             )}

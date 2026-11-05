@@ -17,9 +17,14 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     if (!getToken()) {
       router.replace("/admin/login");
-    } else {
-      setChecked(true);
+      return;
     }
+
+    const timer = setTimeout(() => {
+      setChecked(true);
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [router]);
 
   function handleLogout() {

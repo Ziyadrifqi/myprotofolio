@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import type { NavLink, Profile } from "@/lib/api";
-import { usePreloader } from "./PreloaderContext";
 
 export default function Navbar({
   profile,
@@ -14,7 +13,11 @@ export default function Navbar({
 }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { trigger } = usePreloader();
+
+  // Pastikan menu Kontak di dalam deretan list tidak dobel dengan tombol CTA "Hubungi saya"
+  const filteredNavLinks = navLinks.filter(
+    (l) => l.href !== "#contact" && l.label.toLowerCase() !== "kontak"
+  );
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -27,10 +30,8 @@ export default function Navbar({
     return (e: React.MouseEvent) => {
       e.preventDefault();
       setOpen(false);
-      trigger(() => {
-        const target = document.querySelector(hash);
-        target?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+      const target = document.querySelector(hash);
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
   }
 
@@ -49,15 +50,15 @@ export default function Navbar({
           className="flex items-center gap-2 font-display font-bold text-fog tracking-tight shrink-0"
         >
           <span className="size-8 rounded-full bg-gradient-to-br from-accent to-warm flex items-center justify-center text-ink font-bold text-sm">
-  ZR
-</span>
+            ZR
+          </span>
           <span className="text-[15px] hidden sm:inline">
             {profile.name.split(" ")[0]}
           </span>
         </a>
 
         <ul className="hidden md:flex items-center gap-1 text-sm font-medium">
-          {navLinks.map((link) => (
+          {filteredNavLinks.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
@@ -90,7 +91,7 @@ export default function Navbar({
       {open && (
         <div className="md:hidden mx-auto max-w-4xl mt-2 rounded-2xl glass px-5 py-4 shadow-xl shadow-black/30">
           <ul className="flex flex-col gap-1 text-sm font-medium">
-            {navLinks.map((link) => (
+            {filteredNavLinks.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}

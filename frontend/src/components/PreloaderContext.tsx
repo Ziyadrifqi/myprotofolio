@@ -50,7 +50,6 @@ export function PreloaderProvider({
     return () => {
       initialTimers.current.forEach(clearTimeout);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const trigger = useCallback(

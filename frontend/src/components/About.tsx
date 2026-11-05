@@ -67,11 +67,10 @@ function PillarCard({
   title: string;
   desc: string;
 }) {
-  const spotlight = useSpotlight<HTMLDivElement>();
+  const { onMouseMove } = useSpotlight();
   return (
     <div
-      ref={spotlight.ref}
-      onMouseMove={spotlight.onMouseMove}
+      onMouseMove={onMouseMove}
       className="spotlight glass glass-hover rounded-2xl p-5"
     >
       <div className="size-10 rounded-xl bg-gradient-to-br from-accent/20 to-warm/10 flex items-center justify-center">

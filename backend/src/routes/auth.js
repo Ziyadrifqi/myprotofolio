@@ -1,5 +1,6 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const router = express.Router();
 
@@ -7,7 +8,19 @@ const router = express.Router();
 router.post("/login", (req, res) => {
   const { password } = req.body || {};
 
-  if (!password || password !== process.env.ADMIN_PASSWORD) {
+  const adminPass = process.env.ADMIN_PASSWORD;
+  if (!password || !adminPass) {
+    return res.status(401).json({ error: "Password salah" });
+  }
+
+  // Timing-safe comparison to guard against timing attacks
+  const passBuffer = Buffer.from(String(password));
+  const adminBuffer = Buffer.from(String(adminPass));
+
+  if (
+    passBuffer.length !== adminBuffer.length ||
+    !crypto.timingSafeEqual(passBuffer, adminBuffer)
+  ) {
     return res.status(401).json({ error: "Password salah" });
   }
 

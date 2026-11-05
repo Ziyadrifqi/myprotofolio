@@ -1,5 +1,6 @@
 "use client";
 
+import { Briefcase } from "lucide-react";
 import type { Experience as ExperienceItem } from "@/lib/api";
 import { SectionHeading } from "./About";
 import { useSpotlight } from "./useSpotlight";
@@ -14,52 +15,70 @@ export default function Experience({ experience }: { experience: ExperienceItem[
           subtitle="Disusun dari posisi terbaru ke yang paling lama."
         />
 
-        <div className="mt-12 space-y-5">
-          {experience.map((exp) => (
-            <ExperienceCard key={exp.id} {...exp} />
-          ))}
+        {/* Timeline Container */}
+        <div className="relative mt-14">
+          {/* Continuous vertical line */}
+          <div className="absolute left-4 top-4 bottom-0 w-px bg-gradient-to-b from-accent/50 via-accent/20 to-transparent" />
+
+          <div className="space-y-12 sm:space-y-14">
+            {experience.map((exp) => (
+              <TimelineItem key={exp.id} exp={exp} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function ExperienceCard({
-  role,
-  company,
-  period,
-  description,
-  highlights,
-}: ExperienceItem) {
-  const spotlight = useSpotlight<HTMLDivElement>();
+function TimelineItem({ exp }: { exp: ExperienceItem }) {
+  const { onMouseMove } = useSpotlight();
+  const { role, company, period, description, highlights } = exp;
+
   return (
-    <div
-      ref={spotlight.ref}
-      onMouseMove={spotlight.onMouseMove}
-      className="spotlight glass glass-hover rounded-2xl p-6 sm:p-7"
-    >
-      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
-        <h3 className="font-display text-lg font-bold text-fog">
-          {role}{" "}
-          <span className="text-fog-muted font-medium">— {company}</span>
-        </h3>
-        <span className="inline-flex items-center rounded-full bg-accent/10 border border-accent/25 px-3 py-1 text-xs font-semibold text-accent shrink-0">
+    <div className="relative pl-12 sm:pl-14">
+      {/* Timeline Dot with Glow */}
+      <div className="absolute left-0 top-0">
+        {/* Glow ring */}
+        <div className="absolute -inset-1.5 rounded-full bg-accent/20 blur-md" />
+        {/* Dot circle */}
+        <div className="relative size-8 rounded-full bg-ink border-2 border-accent flex items-center justify-center shadow-lg shadow-accent/25">
+          <Briefcase className="size-3.5 text-accent" />
+        </div>
+      </div>
+
+      {/* Period Badge */}
+      <div className="mb-3 pt-0.5">
+        <span className="inline-flex items-center rounded-full bg-accent/10 border border-accent/25 px-3 py-1 text-xs font-semibold text-accent">
           {period}
         </span>
       </div>
 
-      <p className="mt-3 text-sm text-fog-muted leading-relaxed max-w-2xl text-justify">
-        {description}
-      </p>
+      {/* Experience Card */}
+      <div
+        onMouseMove={onMouseMove}
+        className="spotlight glass glass-hover rounded-2xl p-6 sm:p-7"
+      >
+        <h3 className="font-display text-lg font-bold text-fog">
+          {role}
+        </h3>
+        <p className="mt-1.5 text-sm font-medium text-accent/80">
+          {company}
+        </p>
 
-      <ul className="mt-3 space-y-1.5">
-        {highlights.map((h) => (
-          <li key={h} className="text-sm text-fog-muted flex gap-2 max-w-2xl">
-            <span className="text-warm mt-1 shrink-0">▸</span>
-            <span>{h}</span>
-          </li>
-        ))}
-      </ul>
+        <p className="mt-3 text-sm text-fog-muted leading-relaxed max-w-2xl text-justify">
+          {description}
+        </p>
+
+        <ul className="mt-4 space-y-2">
+          {highlights.map((h) => (
+            <li key={h} className="text-sm text-fog-muted flex gap-2.5 max-w-2xl">
+              <span className="text-accent mt-0.5 shrink-0">▸</span>
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

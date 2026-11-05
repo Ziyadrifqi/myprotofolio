@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS profile (
   linkedin VARCHAR(255),
   cv_url VARCHAR(500),
   available_for_work BOOLEAN DEFAULT TRUE,
-  photo VARCHAR(255) DEFAULT '/images/foto.png',
+  photo VARCHAR(255) DEFAULT '/uploads/foto.png',
   web3forms_access_key VARCHAR(255),
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

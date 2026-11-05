@@ -16,13 +16,13 @@ export default function Preloader() {
       }`}
     >
       <div className="flex flex-col items-center gap-4">
-      <Image
-  src="/images/foto.png"
-  alt="Ziyad Rifqi"
-  width={78}
-  height={50}
-  className="rounded-full border border-white/10"
-/>
+        <Image
+          src="/images/foto.png"
+          alt="Ziyad Rifqi"
+          width={64}
+          height={64}
+          className="rounded-full border border-white/10 object-cover aspect-square"
+        />
         <div className="h-1 w-32 rounded-full bg-white/5 overflow-hidden">
           <div className="h-full w-full bg-gradient-to-r from-accent to-warm animate-[loadbar_1.1s_ease-in-out_infinite]" />
         </div>
