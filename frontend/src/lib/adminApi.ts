@@ -51,8 +51,27 @@ export async function uploadImage(file: File, folder: string): Promise<string> {
 }
 
 /**
+ * Triggers Next.js on-demand ISR revalidation for homepage cache
+ */
+export async function triggerRevalidation() {
+  try {
+    await fetch("/api/revalidate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token: process.env.NEXT_PUBLIC_REVALIDATION_SECRET || "revalidate-secret-token",
+      }),
+    });
+  } catch (err) {
+    console.warn("Failed to trigger revalidation:", err);
+  }
+}
+
+/**
  * Fetch wrapper that attaches the admin bearer token. On a 401 it clears the
  * stored token so the UI can redirect back to the login page.
+ * If a modifying method (POST, PUT, DELETE, PATCH) succeeds, it automatically
+ * triggers on-demand revalidation for the frontend cache.
  */
 export async function authFetch(path: string, options: RequestInit = {}) {
   const token = getToken();
@@ -68,6 +87,11 @@ export async function authFetch(path: string, options: RequestInit = {}) {
 
   if (res.status === 401) {
     clearToken();
+  }
+
+  const method = (options.method || "GET").toUpperCase();
+  if (res.ok && ["POST", "PUT", "DELETE", "PATCH"].includes(method)) {
+    triggerRevalidation();
   }
 
   return res;

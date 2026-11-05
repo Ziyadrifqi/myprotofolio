@@ -52,9 +52,27 @@ router.put("/", requireAuth, async (req, res) => {
     photo,
   } = req.body || {};
 
-  if (!name || !role || !email) {
-    return res.status(400).json({ error: "name, role, and email are required" });
+  if (!name || typeof name !== "string" || !name.trim()) {
+    return res.status(400).json({ error: "Nama wajib diisi" });
   }
+  if (!role || typeof role !== "string" || !role.trim()) {
+    return res.status(400).json({ error: "Role/Profesi wajib diisi" });
+  }
+  if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return res.status(400).json({ error: "Email tidak valid" });
+  }
+
+  const cleanName = name.trim().slice(0, 100);
+  const cleanRole = role.trim().slice(0, 100);
+  const cleanLocation = location ? String(location).trim().slice(0, 100) : "";
+  const cleanTagline = tagline ? String(tagline).trim().slice(0, 255) : "";
+  const cleanSummary = summary ? String(summary).trim().slice(0, 2000) : "";
+  const cleanEmail = email.trim().slice(0, 150);
+  const cleanPhone = phone ? String(phone).trim().slice(0, 30) : "";
+  const cleanGithub = github ? String(github).trim().slice(0, 255) : "";
+  const cleanLinkedin = linkedin ? String(linkedin).trim().slice(0, 255) : "";
+  const cleanCvUrl = cvUrl ? String(cvUrl).trim().slice(0, 255) : "";
+  const cleanPhoto = photo ? String(photo).trim().slice(0, 255) : "";
 
   try {
     const [existing] = await pool.query("SELECT id, photo FROM profile ORDER BY id DESC LIMIT 1");
@@ -64,18 +82,18 @@ router.put("/", requireAuth, async (req, res) => {
         `UPDATE profile SET name=?, role=?, location=?, tagline=?, summary=?, email=?, phone=?,
           github=?, linkedin=?, cv_url=?, available_for_work=?, photo=? WHERE id=?`,
         [
-          name, role, location, tagline, summary, email, phone,
-          github, linkedin, cvUrl, Boolean(availableForWork), photo, existing[0].id,
+          cleanName, cleanRole, cleanLocation, cleanTagline, cleanSummary, cleanEmail, cleanPhone,
+          cleanGithub, cleanLinkedin, cleanCvUrl, Boolean(availableForWork), cleanPhoto, existing[0].id,
         ]
       );
-      if (existing[0].photo && existing[0].photo !== photo) {
+      if (existing[0].photo && existing[0].photo !== cleanPhoto) {
         deleteIfUploaded(existing[0].photo);
       }
     } else {
       await pool.query(
         `INSERT INTO profile (name, role, location, tagline, summary, email, phone, github, linkedin, cv_url, available_for_work, photo)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [name, role, location, tagline, summary, email, phone, github, linkedin, cvUrl, Boolean(availableForWork), photo]
+        [cleanName, cleanRole, cleanLocation, cleanTagline, cleanSummary, cleanEmail, cleanPhone, cleanGithub, cleanLinkedin, cleanCvUrl, Boolean(availableForWork), cleanPhoto]
       );
     }
 
