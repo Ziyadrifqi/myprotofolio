@@ -68,6 +68,23 @@ export default function Contact({ profile }: { profile: Profile }) {
     }
   }
 
+  function getHandle(url: string | undefined, defaultHandle: string) {
+    if (!url) return defaultHandle;
+    try {
+      const parsed = new URL(url);
+      const pathname = parsed.pathname.replace(/^\/|\/$/g, "");
+      if (pathname.startsWith("in/")) {
+        return pathname.replace(/^in\//, "");
+      }
+      return pathname ? `@${pathname}` : defaultHandle;
+    } catch {
+      return defaultHandle;
+    }
+  }
+
+  const githubHandle = getHandle(profile.github, "GitHub Profile");
+  const linkedinHandle = getHandle(profile.linkedin, "LinkedIn Profile");
+
   return (
     <section id="contact" className="px-5 sm:px-8 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
@@ -81,10 +98,10 @@ export default function Contact({ profile }: { profile: Profile }) {
           {/* Contact info list */}
           <div className="space-y-3.5">
             <EmailRow email={profile.email} />
-            <WhatsAppRow phone={profile.phone} />
+            <WhatsAppRow phone={profile.phone} name={profile.name} />
             <InfoRow icon={MapPin} label="Lokasi" value={profile.location} />
-            <InfoRow icon={GithubIcon} label="GitHub" value="@ziyadrifqi" href={profile.github} />
-            <InfoRow icon={LinkedinIcon} label="LinkedIn" value="ziyadrifqi" href={profile.linkedin} />
+            <InfoRow icon={GithubIcon} label="GitHub" value={githubHandle} href={profile.github} />
+            <InfoRow icon={LinkedinIcon} label="LinkedIn" value={linkedinHandle} href={profile.linkedin} />
           </div>
 
           {/* Form */}
@@ -228,11 +245,12 @@ function EmailRow({ email }: { email: string }) {
   );
 }
 
-function WhatsAppRow({ phone }: { phone?: string }) {
+function WhatsAppRow({ phone, name }: { phone?: string; name?: string }) {
   if (!phone) return null;
   const cleanPhone = phone.replace(/[^0-9]/g, "");
-  const waUrl = `https://wa.me/${cleanPhone || "6288225801565"}?text=${encodeURIComponent(
-    "Halo Ziyad, saya tertarik mendiskusikan peluang kerja sama atau proyek dengan Anda."
+  const recipientName = name ? ` ${name.split(" ")[0]}` : "";
+  const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+    `Halo${recipientName}, saya tertarik mendiskusikan peluang kerja sama atau proyek dengan Anda.`
   )}`;
 
   return (

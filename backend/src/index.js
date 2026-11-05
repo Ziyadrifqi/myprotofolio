@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 
 const authRoutes = require("./routes/auth");
 const uploadRoutes = require("./routes/upload");
@@ -14,6 +15,9 @@ const portfolioRoutes = require("./routes/portfolio");
 const app = express();
 const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000").split(",");
 
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Supaya gambar/upload statis tetap bisa diakses frontend
+}));
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
