@@ -11,6 +11,7 @@ type Status = "idle" | "sending" | "sent" | "error";
 // Web3Forms key is meant to be public (it's a submit-only widget key), so it
 // stays as a NEXT_PUBLIC_ env var rather than coming from the backend API.
 const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY || "";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export default function Contact({ profile }: { profile: Profile }) {
   const [status, setStatus] = useState<Status>("idle");
@@ -26,43 +27,86 @@ export default function Contact({ profile }: { profile: Profile }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!WEB3FORMS_ACCESS_KEY) {
-      setStatus("error");
-      setErrorMessage(
-        "Form belum terhubung ke layanan email. Tambahkan NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY di .env.local."
-      );
-      return;
-    }
-
     setStatus("sending");
     setErrorMessage("");
 
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+      // 1. Coba kirim langsung ke backend API portofolio (tersimpan di Inbox admin + notifikasi Gmail SMTP)
+      const res = await fetch(`${API_BASE_URL}/api/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
         },
         body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `Pesan baru dari ${form.name} — Portofolio`,
           name: form.name,
           email: form.email,
           message: form.message,
         }),
       });
 
-      const data = await res.json();
-
-      if (data.success) {
+      if (res.ok) {
         setStatus("sent");
         setForm({ name: "", email: "", message: "" });
-      } else {
-        setStatus("error");
-        setErrorMessage(data.message || "Gagal mengirim pesan. Coba lagi.");
+        return;
       }
+
+      // Jika backend gagal tapi Web3Forms key tersedia, fallback ke Web3Forms
+      if (WEB3FORMS_ACCESS_KEY) {
+        const fallbackRes = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_ACCESS_KEY,
+            subject: `Pesan baru dari ${form.name} — Portofolio`,
+            name: form.name,
+            email: form.email,
+            message: form.message,
+          }),
+        });
+
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.success) {
+          setStatus("sent");
+          setForm({ name: "", email: "", message: "" });
+          return;
+        }
+      }
+
+      const body = await res.json().catch(() => ({}));
+      setStatus("error");
+      setErrorMessage(body.error || "Gagal mengirim pesan. Silakan coba lagi nanti.");
     } catch {
+      // Fallback jika API backend tidak terjangkau (offline / beda origin belum jalan)
+      if (WEB3FORMS_ACCESS_KEY) {
+        try {
+          const fallbackRes = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              access_key: WEB3FORMS_ACCESS_KEY,
+              subject: `Pesan baru dari ${form.name} — Portofolio`,
+              name: form.name,
+              email: form.email,
+              message: form.message,
+            }),
+          });
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData.success) {
+            setStatus("sent");
+            setForm({ name: "", email: "", message: "" });
+            return;
+          }
+        } catch {
+          // ignore
+        }
+      }
+
       setStatus("error");
       setErrorMessage("Tidak bisa terhubung ke server. Periksa koneksi Anda.");
     }

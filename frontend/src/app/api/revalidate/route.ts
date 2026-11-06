@@ -16,3 +16,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to revalidate" }, { status: 500 });
   }
 }
+
