@@ -49,6 +49,19 @@ CREATE TABLE IF NOT EXISTS experience (
   company VARCHAR(255) NOT NULL,
   period VARCHAR(100) NOT NULL,
   description TEXT NOT NULL,
+  highlights JSON,
+  sort_order INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+  description TEXT NOT NULL,
   highlights JSON NOT NULL,
   sort_order INT NOT NULL DEFAULT 0
 );

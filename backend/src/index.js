@@ -11,6 +11,7 @@ const projectsRoutes = require("./routes/projects");
 const experienceRoutes = require("./routes/experience");
 const navLinksRoutes = require("./routes/navLinks");
 const portfolioRoutes = require("./routes/portfolio");
+const messagesRoutes = require("./routes/messages");
 
 const app = express();
 const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000").split(",");
@@ -31,6 +32,7 @@ app.use("/api/projects", projectsRoutes);
 app.use("/api/experience", experienceRoutes);
 app.use("/api/nav-links", navLinksRoutes);
 app.use("/api/portfolio", portfolioRoutes);
+app.use("/api/messages", messagesRoutes);
 
 app.use((req, res) => res.status(404).json({ error: "Not found" }));
 
