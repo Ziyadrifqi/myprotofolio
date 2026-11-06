@@ -18,7 +18,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "ZiyadRifqi Permana — Full Stack Developer",
-   icons: {
+  icons: {
     icon: "/images/foto.png",
   },
   description:
@@ -30,6 +30,24 @@ export const metadata: Metadata = {
     "Next.js Developer",
     "Portfolio",
   ],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  openGraph: {
+    title: "ZiyadRifqi Permana — Full Stack Developer",
+    description:
+      "Portofolio Ziyad Rifqi Permana, Full Stack Developer yang membangun produk web dari sistem backend sampai pengalaman antarmuka.",
+    url: "/",
+    siteName: "ZiyadRifqi Permana Portfolio",
+    locale: "id_ID",
+    type: "website",
+    images: [
+      {
+        url: "/images/foto.png",
+        width: 800,
+        height: 800,
+        alt: "ZiyadRifqi Permana",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
