@@ -57,4 +57,10 @@ router.post("/login", loginLimiter, async (req, res) => {
   res.json({ token });
 });
 
+// GET /api/auth/me - Verifikasi token admin
+const requireAuth = require("../middleware/auth");
+router.get("/me", requireAuth, (req, res) => {
+  res.json({ authenticated: true, role: "admin" });
+});
+
 module.exports = router;

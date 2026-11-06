@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getToken, clearToken } from "@/lib/adminApi";
+import { getToken, clearToken, verifyToken } from "@/lib/adminApi";
 import AdminShell, { type AdminTabKey } from "@/components/admin/AdminShell";
 import ProfileEditor from "@/components/admin/ProfileEditor";
 import StackEditor from "@/components/admin/StackEditor";
 import ProjectsEditor from "@/components/admin/ProjectsEditor";
 import ExperienceEditor from "@/components/admin/ExperienceEditor";
+import MessagesEditor from "@/components/admin/MessagesEditor";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -15,16 +16,31 @@ export default function AdminDashboardPage() {
   const [tab, setTab] = useState<AdminTabKey>("profile");
 
   useEffect(() => {
-    if (!getToken()) {
-      router.replace("/admin/login");
-      return;
+    let isMounted = true;
+
+    async function checkAuth() {
+      if (!getToken()) {
+        router.replace("/admin/login");
+        return;
+      }
+
+      const isValid = await verifyToken();
+      if (!isMounted) return;
+
+      if (!isValid) {
+        clearToken();
+        router.replace("/admin/login?expired=1");
+        return;
+      }
+
+      setChecked(true);
     }
 
-    const timer = setTimeout(() => {
-      setChecked(true);
-    }, 0);
+    checkAuth();
 
-    return () => clearTimeout(timer);
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
 
   function handleLogout() {
@@ -40,6 +56,7 @@ export default function AdminDashboardPage() {
       {tab === "stack" && <StackEditor />}
       {tab === "projects" && <ProjectsEditor />}
       {tab === "experience" && <ExperienceEditor />}
+      {tab === "messages" && <MessagesEditor />}
     </AdminShell>
   );
 }

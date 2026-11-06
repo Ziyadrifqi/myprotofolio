@@ -30,6 +30,26 @@ export async function login(password: string): Promise<void> {
   setToken(token);
 }
 
+/**
+ * Memverifikasi validitas token JWT dengan backend
+ */
+export async function verifyToken(): Promise<boolean> {
+  const token = getToken();
+  if (!token) return false;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) return true;
+    clearToken();
+    return false;
+  } catch {
+    // Jika backend offline/error, token tetap dipertahankan sementara kecuali 401
+    return true;
+  }
+}
+
 export async function uploadImage(file: File, folder: string): Promise<string> {
   const token = getToken();
   const formData = new FormData();
